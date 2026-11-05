@@ -1,0 +1,53 @@
+public class WeekTwoHomework {
+
+    public static void getContacts() {
+        List<Contact> contacts = [
+            SELECT FirstName, LastName, Account.Name, Account.Industry
+            FROM Contact
+            WHERE AccountId != null
+        ];
+
+        for (Contact con : contacts) {
+            System.debug('Contact Account: ' + con.Account.Name);
+            System.debug('Industry: ' + con.Account.Industry);
+        }
+    }
+
+    public static void getAccountsWithOpportunities() {
+        List<Account> accounts = [
+            SELECT Name,
+                (SELECT Name FROM Opportunities WHERE IsWon = true)
+            FROM Account
+        ];
+
+        for (Account acc : accounts) {
+            for (Opportunity opp : acc.Opportunities) {
+                System.debug('Account: ' + acc.Name);
+                System.debug('Opportunity: ' + opp.Name);
+            }
+        }
+    }
+
+    public static void getOpportunitiesMap() {
+        Map<Id, Opportunity> opportunities = new Map<Id, Opportunity>([
+            SELECT Id, Name, StageName, Amount
+            FROM Opportunity
+        ]);
+
+        System.debug(opportunities);
+    }
+
+    public static Integer countOpenOpportunities() {
+        AggregateResult[] results = [
+            SELECT COUNT(Id) totalOpen
+            FROM Opportunity
+            WHERE IsClosed = false
+        ];
+
+        Integer total = (Integer) results[0].get('totalOpen');
+
+        System.debug('Total Open Opportunities: ' + total);
+
+        return total;
+    }
+}
