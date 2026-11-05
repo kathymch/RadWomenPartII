@@ -1,13 +1,11 @@
 trigger LeadTrigger on Lead (after insert, after update) {
-
-    if (Trigger.isInsert && Trigger.isAfter) {
-        LeadTriggerHandler.handleAfterInsert(Trigger.new);
-    }
-
-    if (Trigger.isUpdate && Trigger.isAfter) {
-        LeadTriggerHandler.handleAfterUpdate(
-            Trigger.new,
-            Trigger.oldMap
-        );
+    if (trigger.isInsert){
+        if (trigger.isAfter){
+            LeadTriggerHandler.handleAfterInsert(Trigger.new);
+        }
+    } else if (trigger.isUpdate){
+        if (trigger.isAfter) {
+            LeadTriggerHandler.handleAfterUpdate(trigger.new, trigger.oldMap);
+        }
     }
 }
