@@ -1,0 +1,62 @@
+public with sharing class LeadTriggerHandler {
+
+    // Handles newly created Leads
+    public static void handleAfterInsert(List<Lead> newLeads) {
+
+        List<Task> tasksToInsert = new List<Task>();
+
+        for (Lead leadRecord : newLeads) {
+
+            if (leadRecord.ProductInterest__c != null) {
+
+                Task newTask = new Task();
+
+                newTask.Subject = 'Follow up - ' + leadRecord.ProductInterest__c;
+                newTask.WhoId = leadRecord.Id;
+                newTask.Status = 'Not Started';
+                newTask.Priority = 'Normal';
+
+                tasksToInsert.add(newTask);
+            }
+        }
+
+        if (!tasksToInsert.isEmpty()) {
+            insert tasksToInsert;
+        }
+    }
+
+
+    // Handles updated Leads
+    public static void handleAfterUpdate(
+        List<Lead> newLeads,
+        Map<Id, Lead> oldLeadMap
+    ) {
+
+        List<Task> tasksToInsert = new List<Task>();
+
+        for (Lead leadRecord : newLeads) {
+
+            Lead oldLead = oldLeadMap.get(leadRecord.Id);
+
+            // Only create a task if Product Interest changed
+            if (leadRecord.ProductInterest__c != oldLead.ProductInterest__c
+                && leadRecord.ProductInterest__c != null) {
+
+                Task newTask = new Task();
+
+                newTask.Subject = 'Follow up - ' + leadRecord.ProductInterest__c;
+                newTask.WhoId = leadRecord.Id;
+                newTask.Status = 'Not Started';
+                newTask.Priority = 'Normal';
+
+                tasksToInsert.add(newTask);
+            }
+        }
+
+        if (!tasksToInsert.isEmpty()) {
+            insert tasksToInsert;
+        }
+    }
+}
+
+
